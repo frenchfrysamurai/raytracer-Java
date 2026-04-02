@@ -63,6 +63,11 @@ public class Vec3 {
         return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
 
+    public boolean nearZero() {
+        double s = 1e-8;
+        return Math.abs(e[0]) < s && Math.abs(e[1]) < s && Math.abs(e[2]) < s;
+    }
+
     @Override
     public String toString() {
         return e[0] + " " + e[1] + " " + e[2];
@@ -106,5 +111,55 @@ public class Vec3 {
 
     public static Vec3 unitVector(Vec3 v) {
         return divide(v, v.length());
+    }
+
+    public static Vec3 random() {
+        return new Vec3(Rtweekend.randomDouble(), Rtweekend.randomDouble(), Rtweekend.randomDouble());
+    }
+
+    public static Vec3 random(double min, double max) {
+        return new Vec3(
+            Rtweekend.randomDouble(min, max),
+            Rtweekend.randomDouble(min, max),
+            Rtweekend.randomDouble(min, max)
+        );
+    }
+
+    public static Vec3 randomUnitVector() {
+        while (true) {
+            Vec3 p = random(-1, 1);
+            double lensq = p.lengthSquared();
+            if (1e-160 < lensq && lensq <= 1) {
+                return divide(p, Math.sqrt(lensq));
+            }
+        }
+    }
+
+    public static Vec3 randomOnHemisphere(Vec3 normal) {
+        Vec3 onUnitSphere = randomUnitVector();
+        if (dot(onUnitSphere, normal) > 0.0) {
+            return onUnitSphere;
+        }
+        return onUnitSphere.negate();
+    }
+
+    public static Vec3 randomInUnitDisk() {
+        while (true) {
+            Vec3 p = new Vec3(Rtweekend.randomDouble(-1, 1), Rtweekend.randomDouble(-1, 1), 0);
+            if (p.lengthSquared() < 1) {
+                return p;
+            }
+        }
+    }
+
+    public static Vec3 reflect(Vec3 v, Vec3 n) {
+        return subtract(v, multiply(2 * dot(v, n), n));
+    }
+
+    public static Vec3 refract(Vec3 uv, Vec3 n, double etaiOverEtat) {
+        double cosTheta = Math.min(dot(uv.negate(), n), 1.0);
+        Vec3 rOutPerp = multiply(etaiOverEtat, add(uv, multiply(cosTheta, n)));
+        Vec3 rOutParallel = multiply(-Math.sqrt(Math.abs(1.0 - rOutPerp.lengthSquared())), n);
+        return add(rOutPerp, rOutParallel);
     }
 }

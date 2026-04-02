@@ -1,6 +1,7 @@
 public class HitRecord {
     public Point3 p;
     public Vec3 normal;
+    public Material mat;
     public double t;
     public boolean frontFace;
 
@@ -12,6 +13,7 @@ public class HitRecord {
     public void copyFrom(HitRecord src) {
         this.p = src.p;
         this.normal = src.normal;
+        this.mat = src.mat;
         this.t = src.t;
         this.frontFace = src.frontFace;
     }
